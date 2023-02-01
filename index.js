@@ -1,15 +1,32 @@
-const http = require("http");
+// const fs = require("fs").promises;
+
+const express = require("express");
+
+const app = express();
 
 const PORT = 8081;
 
-const requestHeandler = (req, res) => {
-  res.writeHead(200, { "content-type": "text/html" });
-  res.end("<h1>qweqweqwe</h1>");
-};
+app.use(express.json());
+app.get("/", async (req, res) => {
+  // const manifest = await fs.readFile("./db/contacts.json", "utf8");
 
-const server = http.createServer(requestHeandler);
+  res.send("get request");
+  // res.json(manifest);
+});
+app.post("/", (req, res) => {
+  res.send("post request");
+});
+app.delete("/", (req, res) => {
+  res.send("delete request");
+});
+app.patch("/", (req, res) => {
+  res.send("patch request");
+});
+app.use((req, res) => {
+  res.send("middleware request");
+});
 
-server.listen(PORT, (err) => {
+app.listen(PORT, (err) => {
   if (err) {
     console.error("Error at server launch:", err);
   }
