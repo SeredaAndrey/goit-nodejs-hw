@@ -1,19 +1,15 @@
 const fs = require("fs").promises;
 const path = require("path");
-const readline = require("readline");
 
 const contactsPath = path.basename("./db/contacts.json");
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
 async function listContacts() {
-  // console.log("list contacts");
-
-  const manifest = await fs.readFile("./db/contacts.json", "utf8");
-  console.table(manifest);
+  try {
+    const contacts = await fs.readFile("./db/contacts.json", "utf8");
+    console.table(contacts.toString());
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function getContactById(contactId) {
@@ -21,12 +17,7 @@ function getContactById(contactId) {
 }
 
 function removeContact(contactId) {
-  rl.question("input ID", (value) => {
-    contactId = value;
-    console.log(`delete contact ${contactId}`);
-    return;
-  });
-  // console.log(`delete contact ${contactId}`);
+  console.log(`delete contact ${contactId}`);
 }
 
 function addContact(name, email, phone) {
