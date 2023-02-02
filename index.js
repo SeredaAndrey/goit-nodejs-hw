@@ -1,34 +1,38 @@
-// const fs = require("fs").promises;
+const { Command } = require("commander");
+const program = new Command();
+program
+  .option("-a, --action <type>", "choose action")
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
 
-const express = require("express");
+program.parse(process.argv);
 
-const app = express();
+const argv = program.opts();
 
-const PORT = 8081;
+// TODO: рефакторить
+function invokeAction({ action, id, name, email, phone }) {
+  switch (action) {
+    case "list":
+      // ...
+      break;
 
-app.use(express.json());
-app.get("/", async (req, res) => {
-  // const manifest = await fs.readFile("./db/contacts.json", "utf8");
+    case "get":
+      // ... id
+      break;
 
-  res.send("get request");
-  // res.json(manifest);
-});
-app.post("/", (req, res) => {
-  res.send("post request");
-});
-app.delete("/", (req, res) => {
-  res.send("delete request");
-});
-app.patch("/", (req, res) => {
-  res.send("patch request");
-});
-app.use((req, res) => {
-  res.send("middleware request");
-});
+    case "add":
+      // ... name email phone
+      break;
 
-app.listen(PORT, (err) => {
-  if (err) {
-    console.error("Error at server launch:", err);
+    case "remove":
+      // ... id
+      break;
+
+    default:
+      console.warn("\x1B[31m Unknown action type!");
   }
-  console.log(`server started at port ${PORT}`);
-});
+}
+
+invokeAction(argv);
