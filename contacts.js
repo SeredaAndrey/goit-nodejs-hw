@@ -1,27 +1,61 @@
 const fs = require("fs").promises;
 const path = require("path");
+const shortid = require("shortid");
 
-const contactsPath = path.basename("./db/contacts.json");
+const contactsPath = path.win32.format({
+  dir: "./db",
+  base: "contacts.json",
+});
 
 async function listContacts() {
   try {
-    const contacts = await fs.readFile("./db/contacts.json", "utf8");
-    console.table(contacts.toString());
+    const json = await fs.readFile(contactsPath, "utf8");
+    const contacts = JSON.parse(json);
+    console.table(contacts);
   } catch (error) {
     console.log(error);
   }
 }
 
-function getContactById(contactId) {
-  console.log(`get contact by ID ${contactId}`);
+async function getContactById(contactId) {
+  try {
+    const json = await fs.readFile(contactsPath, "utf8");
+    const contacts = JSON.parse(json);
+    const index = contacts.findIndex((contact) => contact.id === contactId);
+    console.table(contacts[index]);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-function removeContact(contactId) {
-  console.log(`delete contact ${contactId}`);
+async function removeContact(contactId) {
+  try {
+    const json = await fs.readFile(contactsPath, "utf8");
+    const contacts = JSON.parse(json);
+    const index = contacts.findIndex((contact) => contact.id === contactId);
+    if (index >= 0) {
+      console.log("delete contact - successful");
+      contacts.splice(index, 1);
+      await fs.writeFile(contactsPath, JSON.stringify(contacts));
+    } else {
+      console.log(`contact with id #${contactId} is not in the database`);
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-function addContact(name, email, phone) {
-  console.log(`add contact ${name}, ${email}, ${phone}`);
+async function addContact(name, email, phone) {
+  try {
+    const json = await fs.readFile(contactsPath, "utf8");
+    const contacts = JSON.parse(json);
+    const id = shortid.generate();
+    const contact = { id, name, email, phone };
+    contacts.push(contact);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts));
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 module.exports = {
@@ -30,35 +64,3 @@ module.exports = {
   removeContact,
   addContact,
 };
-// const express = require("express");
-
-// const app = express();
-
-// const PORT = 8081;
-
-// app.use(express.json());
-// app.get("/", async (req, res) => {
-//   // const manifest = await fs.readFile("./db/contacts.json", "utf8");
-
-//   res.send("get request");
-//   // res.json(manifest);
-// });
-// app.post("/", (req, res) => {
-//   res.send("post request");
-// });
-// app.delete("/", (req, res) => {
-//   res.send("delete request");
-// });
-// app.patch("/", (req, res) => {
-//   res.send("patch request");
-// });
-// app.use((req, res) => {
-//   res.send("middleware request");
-// });
-
-// app.listen(PORT, (err) => {
-//   if (err) {
-//     console.error("Error at server launch:", err);
-//   }
-//   console.log(`server started at port ${PORT}`);
-// });
