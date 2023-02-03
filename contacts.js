@@ -34,9 +34,9 @@ async function removeContact(contactId) {
     const contacts = JSON.parse(json);
     const index = contacts.findIndex((contact) => contact.id === contactId);
     if (index >= 0) {
-      console.log("delete contact - successful");
       contacts.splice(index, 1);
       await fs.writeFile(contactsPath, JSON.stringify(contacts));
+      console.log("delete contact - successful");
     } else {
       console.log(`contact with id #${contactId} is not in the database`);
     }
@@ -47,12 +47,30 @@ async function removeContact(contactId) {
 
 async function addContact(name, email, phone) {
   try {
-    const json = await fs.readFile(contactsPath, "utf8");
-    const contacts = JSON.parse(json);
-    const id = shortid.generate();
-    const contact = { id, name, email, phone };
-    contacts.push(contact);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts));
+    if (name && email && phone) {
+      let flag = false;
+      const json = await fs.readFile(contactsPath, "utf8");
+      const contacts = JSON.parse(json);
+
+      for (const contact of contacts) {
+        if (contact.name === name) {
+          console.log(`${name} is alredy in contacts`);
+          flag = true;
+          break;
+        }
+      }
+      if (!flag) {
+        const id = shortid.generate();
+        const contact = { id, name, email, phone };
+        contacts.push(contact);
+        await fs.writeFile(contactsPath, JSON.stringify(contacts));
+        console.log("add contact - successful");
+      }
+    } else {
+      console.log(
+        "name, еmail and number is a required parameter. contact was not added"
+      );
+    }
   } catch (error) {
     console.log(error);
   }
