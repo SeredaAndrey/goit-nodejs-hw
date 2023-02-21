@@ -21,8 +21,8 @@ async function getContactById(contactId) {
   try {
     const json = await fs.readFile(contactsPath, "utf8");
     const contacts = JSON.parse(json);
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    console.table(contacts[index]);
+    const contact = contacts.find((contact) => contact.id === contactId);
+    console.table(contact);
   } catch (error) {
     console.log(error);
   }
@@ -48,18 +48,19 @@ async function removeContact(contactId) {
 async function addContact(name, email, phone) {
   try {
     if (name && email && phone) {
-      let flag = false;
+      let existingContact = false;
       const json = await fs.readFile(contactsPath, "utf8");
       const contacts = JSON.parse(json);
 
       for (const contact of contacts) {
-        if (contact.name === name) {
-          console.log(`${name} is alredy in contacts`);
-          flag = true;
+        if (contact.email === email) {
+          console.log(`a contact with mail ${email} alredy exists`);
+          existingContact = true;
           break;
         }
       }
-      if (!flag) {
+
+      if (!existingContact) {
         const id = shortid.generate();
         const contact = { id, name, email, phone };
         contacts.push(contact);
